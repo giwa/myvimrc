@@ -2,6 +2,9 @@ import os
 # vim repository
 # https://github.com/giwa/myvimrc.git
 
+command = "cp ./.vimrc ~/"
+os.system(command)
+
 git_clone_command = 'git clone '
 neo_bundle_git = 'git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim'
 molokai_git = 'https://github.com/tomasr/molokai /tmp/molokai'
@@ -17,3 +20,7 @@ os.system(command)
 
 command = 'cp -rf /tmp/molokai/colors ~/.vim/'
 os.system(command)
+
+command = 'rm -rf /tmp/molokai/'
+os.system(command)
+
