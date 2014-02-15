@@ -41,7 +41,7 @@
  set backspace=indent,eol,start
 
  " softtabstopはTabキー押し下げ時の挿入される空白の量，0の場合はtabstopと同じ，BSにも影響する
- set tabstop=2 shiftwidth=2 softtabstop=0
+ set tabstop=4 shiftwidth=4 softtabstop=0
 
  "filetype plugin on " ファイルタイプの検索を有効にする
  "filetype indent on " ファイルタイプに合わせたインデントを利用する
