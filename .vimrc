@@ -35,7 +35,7 @@
  set autoindent     " オートインデント
  set smartindent    " 新しい行を開始した時に、新しい行のインデントを現在行と同じ量にする
  set cindent        " Cプログラムの自動インデント
- set expandtab      " タブキーを空白に変換
+ "set expandtab      " タブキーを空白に変換
 
  " オートインデント、改行、インサートモード開始直後にバックスペースキーで削除できるようにする
  set backspace=indent,eol,start
