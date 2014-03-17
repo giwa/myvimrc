@@ -231,5 +231,5 @@ if has('vim_starting')
  NeoBundle 'tpope/vim-pathogen'        " プラグイン管理
  NeoBundle 'thinca/vim-quickrun'       " 各種ソースコードをすばやく実行
  NeoBundle 'scrooloose/nerdcommenter'  " コメントアウト<Leader>c<Space> コメントアウト解除<Leadar>cu
-
+ NeoBundle 'zhaocai/GoldenView.Vim' "Always have a nice view for vim split windows
  filetype plugin indent on     " required
