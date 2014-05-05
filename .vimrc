@@ -35,7 +35,7 @@
  set autoindent     " オートインデント
  set smartindent    " 新しい行を開始した時に、新しい行のインデントを現在行と同じ量にする
  set cindent        " Cプログラムの自動インデント
- "set expandtab      " タブキーを空白に変換
+ set expandtab      " タブキーを空白に変換
 
  " オートインデント、改行、インサートモード開始直後にバックスペースキーで削除できるようにする
  set backspace=indent,eol,start
@@ -232,4 +232,5 @@ if has('vim_starting')
  NeoBundle 'thinca/vim-quickrun'       " 各種ソースコードをすばやく実行
  NeoBundle 'scrooloose/nerdcommenter'  " コメントアウト<Leader>c<Space> コメントアウト解除<Leadar>cu
  NeoBundle 'zhaocai/GoldenView.Vim' "Always have a nice view for vim split windows
+ NeoBundle 'derekwyatt/vim-scala' "syntax for scala
  filetype plugin indent on     " required
