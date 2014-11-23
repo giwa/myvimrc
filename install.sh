@@ -12,6 +12,6 @@ git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
 
 # Clone solarized
 git clone https://github.com/altercation/vim-colors-solarized.git /tmp/solarized
-cp -rf /tmp/solarized/colors ./.vim/
+cp -rf /tmp/solarized/colors ~/.vim/
 rm -rf /tmp/solarized
 
