@@ -41,7 +41,7 @@
  set backspace=indent,eol,start
 
  " softtabstopはTabキー押し下げ時の挿入される空白の量，0の場合はtabstopと同じ，BSにも影響する
- set tabstop=2 shiftwidth=2 softtabstop=0
+ set tabstop=4 shiftwidth=4 softtabstop=0
 
  "filetype plugin on " ファイルタイプの検索を有効にする
  "filetype indent on " ファイルタイプに合わせたインデントを利用する
@@ -179,13 +179,53 @@
  " inoremap : 挿入モード限定
 
 
+" https://sites.google.com/site/fudist/Home/vim-nihongo-ban/-vimrc-sample
+""""""""""""""""""""""""""""""
+" 挿入モード時、ステータスラインの色を変更
+""""""""""""""""""""""""""""""
+let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
+
+if has('syntax')
+  augroup InsertHook
+    autocmd!
+    autocmd InsertEnter * call s:StatusLine('Enter')
+    autocmd InsertLeave * call s:StatusLine('Leave')
+  augroup END
+endif
+
+let s:slhlcmd = ''
+function! s:StatusLine(mode)
+  if a:mode == 'Enter'
+    silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+    silent exec g:hi_insert
+  else
+    highlight clear StatusLine
+    silent exec s:slhlcmd
+  endif
+endfunction
+
+function! s:GetHighlight(hi)
+  redir => hl
+  exec 'highlight '.a:hi
+  redir END
+  let hl = substitute(hl, '[\r\n]', '', 'g')
+  let hl = substitute(hl, 'xxx', '', '')
+  return hl
+endfunction
+""""""""""""""""""""""""""""""
+
+
+
+
+
  "------------------------------------------------------------
  " プラグイン
  "------------------------------------------------------------
  " molokai.vim
  let g:molokai_original = 1
  set t_Co=256
- colorscheme molokai
+ "colorscheme molokai
+ colorscheme solarized
 
  " neocomplcache
  let g:neocomplcache_enable_at_startup = 1 " 起動時に有効化
@@ -214,16 +254,22 @@ if has('vim_starting')
  " originalrepos on github
  NeoBundle 'Shougo/neobundle.vim'      " プラグイン管理
 
- NeoBundle 'Shougo/vimproc'
 
- NeoBundle 'Shougo/vimproc'            " 非同期処理のため
+ NeoBundle 'Shougo/vimproc.vim', {
+             \'build' : {
+             \    'windows' : 'tools\\update-dll-mingw',
+             \    'cygwin' : 'make -f make_cygwin.mak',
+             \    'mac' : 'make -f make_mac.mak',
+             \    'linux' : 'make',
+             \    'unix' : 'gmake',
+             \   },
+             \}
  NeoBundle 'VimClojure'                " vimにおけるクロージャの開発環境
  NeoBundle 'Shougo/vimshell'           " vimからシェルを起動する
  NeoBundle 'Shougo/unite.vim'          " vim上で使用出来る統合ユーザーインターフェース
  NeoBundle 'Shougo/neocomplcache'      " 補完
  NeoBundle 'Shougo/neosnippet'         " スニペット
  NeoBundle 'jpalardy/vim-slime'        " ??
- NeoBundle 'mattn/zencoding-vim'       " zencodingプラグイン
  NeoBundle 'othree/html5.vim'          " html5のタグのカラー
  NeoBundle 'Townk/vim-autoclose'       " カッコやダブルコーテーションを自動で閉じる
  NeoBundle 'kien/ctrlp.vim.git'        " コマンドラインでのファイル補完
@@ -231,5 +277,18 @@ if has('vim_starting')
  NeoBundle 'tpope/vim-pathogen'        " プラグイン管理
  NeoBundle 'thinca/vim-quickrun'       " 各種ソースコードをすばやく実行
  NeoBundle 'scrooloose/nerdcommenter'  " コメントアウト<Leader>c<Space> コメントアウト解除<Leadar>cu
+ NeoBundle 'zhaocai/GoldenView.Vim' "Always have a nice view for vim split windows
+ NeoBundle 'derekwyatt/vim-scala' "syntax for scala
+ NeoBundle 'fatih/vim-go' "syntax for scala
+ NeoBundle 'scrooloose/nerdtree'
+
+ NeoBundle 'tpope/vim-fugitive'
+ autocmd QuickFixCmdPost *grep* cwindow
+ set statusline+=%{fugitive#statusline()}
+
+ NeoBundle 'nathanaelkane/vim-indent-guides'
+ let g:indent_guides_enable_on_vim_startup = 1
+ NeoBundle 'bronson/vim-trailing-whitespace'
+
 
  filetype plugin indent on     " required
