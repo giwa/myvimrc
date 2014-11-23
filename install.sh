@@ -2,7 +2,7 @@
 
 # Get script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cp "$DIR/vimrc ./.vimrc"
+cp "$DIR/vimrc ~/.vimrc"
 
 # Create directory for vim bundle
 mkdir -p ~/.vim/bundle
