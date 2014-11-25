@@ -250,7 +250,7 @@ if has('vim_starting')
    set runtimepath+=~/.vim/bundle/neobundle.vim/
  endif
 
- call neobundle#rc(expand('~/.vim/bundle/'))
+call neobundle#begin(expand('~/.vim/bundle/'))
 
  " originalrepos on github
  NeoBundle 'Shougo/neobundle.vim'      " プラグイン管理
@@ -270,6 +270,7 @@ if has('vim_starting')
  NeoBundle 'Shougo/unite.vim'          " vim上で使用出来る統合ユーザーインターフェース
  NeoBundle 'Shougo/neocomplcache'      " 補完
  NeoBundle 'Shougo/neosnippet'         " スニペット
+ NeoBundle 'Shougo/neosnippet-snippets'
  NeoBundle 'jpalardy/vim-slime'        " ??
  NeoBundle 'othree/html5.vim'          " html5のタグのカラー
  NeoBundle 'Townk/vim-autoclose'       " カッコやダブルコーテーションを自動で閉じる
@@ -293,3 +294,4 @@ if has('vim_starting')
 
 
  filetype plugin indent on     " required
+ call neobundle#end()
