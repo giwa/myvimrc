@@ -214,8 +214,14 @@ function! s:GetHighlight(hi)
 endfunction
 """"""""""""""""""""""""""""""
 
-
-
+ highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
+ match OverLength /\%>80v.\+/
+ highlight OverLength ctermbg=red ctermfg=white
+ match OverLength /\%81v.\+/
+ set cc=80
+ au BufRead,BufNewFile *.py set cc=72
+ execute "set colorcolumn=" . join(range(81,335), ',')
+ :hi ColorColumn ctermbg=234
 
 
  "------------------------------------------------------------
@@ -225,7 +231,6 @@ endfunction
  let g:molokai_original = 1
  set t_Co=256
  "colorscheme molokai
- set background=dark
  colorscheme solarized
 
  " neocomplcache
@@ -250,11 +255,10 @@ if has('vim_starting')
    set runtimepath+=~/.vim/bundle/neobundle.vim/
  endif
 
-call neobundle#begin(expand('~/.vim/bundle/'))
+ call neobundle#begin(expand('~/.vim/bundle/'))
 
  " originalrepos on github
  NeoBundle 'Shougo/neobundle.vim'      " プラグイン管理
-
 
  NeoBundle 'Shougo/vimproc.vim', {
              \'build' : {
@@ -283,6 +287,10 @@ call neobundle#begin(expand('~/.vim/bundle/'))
  NeoBundle 'derekwyatt/vim-scala' "syntax for scala
  NeoBundle 'fatih/vim-go' "syntax for scala
  NeoBundle 'scrooloose/nerdtree'
+ NeoBundle 'mattn/emmet-vim' "zencoding
+
+ let g:user_emmet_expandabbr_key = '<C-Y>'
+
 
  NeoBundle 'tpope/vim-fugitive'
  autocmd QuickFixCmdPost *grep* cwindow
