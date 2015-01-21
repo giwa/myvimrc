@@ -17,6 +17,7 @@ fi
 if [ ! -f ~/.vim/colors/solarized.vim ]; then
     # Clone solarized
     git clone https://github.com/altercation/vim-colors-solarized.git /tmp/solarized
+    mkdir -p ~/.vim/colors
     cp -rf /tmp/solarized/colors/solarized.vim ~/.vim/colors/
     rm -rf /tmp/solarized
 fi
