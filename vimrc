@@ -14,8 +14,8 @@
  set autowrite
  " キーコードはすぐにタイムアウト  マッピングはタイムアウトしない
  set notimeout ttimeout ttimeoutlen=200
-
-
+ "filetype plugin indent on
+ au BufRead,BufNewFile *.go setlocal filetype=go
  "------------------------------------------------------------
  " ステータスライン
  "------------------------------------------------------------
@@ -117,6 +117,12 @@
 
  " Escの2回押しでハイライト消去
  nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
+ inoremap <C-j> <Esc>
+ inoremap <silent> jj <ESC>
+ inoremap <silent> hh <ESC>
+ inoremap <silent> kk <ESC>
+ " inoremap <silent> ll <ESC>
+
 
  " MEMO
  " incsearch : " インクリメンタルサーチとは「検索文字列を入力完了する前に、入力中の文字列にマッチしている場所へ移動する」機能
@@ -127,11 +133,6 @@
  "------------------------------------------------------------
  set nostartofline " 移動コマンドを使ったとき、行頭に移動しない
 
- " インサートモードでもhjklで移動（Ctrlを押しながら）
- inoremap <C-j> <Down>
- inoremap <C-k> <Up>
- inoremap <C-h> <Left>
- inoremap <C-l> <Right>
 
  " インサートモードでも削除
  inoremap <C-x> <BS>
@@ -219,10 +220,13 @@ endfunction
  highlight OverLength ctermbg=red ctermfg=white
  match OverLength /\%81v.\+/
  set cc=80
- au BufRead,BufNewFile *.py set cc=72
+ "au BufRead,BufNewFile *.py set cc=72
+ au BufRead,BufNewFile *.rb set tabstop=2 shiftwidth=2
  execute "set colorcolumn=" . join(range(81,335), ',')
  :hi ColorColumn ctermbg=234
 
+ let mapleader=","
+ inoremap <leader>, <C-x><C-o>
 
  "------------------------------------------------------------
  " プラグイン
@@ -230,7 +234,6 @@ endfunction
  " molokai.vim
  let g:molokai_original = 1
  set t_Co=256
- "colorscheme molokai
  colorscheme solarized
 
  " neocomplcache
@@ -247,6 +250,8 @@ endfunction
  let g:ctrolp_use_migemo    = 1 " ミゲモ検索
  let g:ctrlp_jump_to_buffer = 2 " タブで開かれた場合はそのタブに切り替える
  let g:ctrlp_open_new_file  = 1 " 新規作成時にタブで開く
+
+ " go
 
  " NeoBundle
  filetype off
@@ -273,8 +278,10 @@ if has('vim_starting')
  NeoBundle 'Shougo/vimshell'           " vimからシェルを起動する
  NeoBundle 'Shougo/unite.vim'          " vim上で使用出来る統合ユーザーインターフェース
  NeoBundle 'Shougo/neocomplcache'      " 補完
+ NeoBundle 'Shougo/neocomplete'      " 補完
  NeoBundle 'Shougo/neosnippet'         " スニペット
  NeoBundle 'Shougo/neosnippet-snippets'
+ NeoBundle 'fatih/vim-go' "syntax for go
  NeoBundle 'jpalardy/vim-slime'        " ??
  NeoBundle 'othree/html5.vim'          " html5のタグのカラー
  NeoBundle 'Townk/vim-autoclose'       " カッコやダブルコーテーションを自動で閉じる
@@ -285,12 +292,16 @@ if has('vim_starting')
  NeoBundle 'scrooloose/nerdcommenter'  " コメントアウト<Leader>c<Space> コメントアウト解除<Leadar>cu
  NeoBundle 'zhaocai/GoldenView.Vim' "Always have a nice view for vim split windows
  NeoBundle 'derekwyatt/vim-scala' "syntax for scala
- NeoBundle 'fatih/vim-go' "syntax for scala
  NeoBundle 'scrooloose/nerdtree'
  NeoBundle 'mattn/emmet-vim' "zencoding
+ "NeoBundle 'bling/vim-airline'
+ NeoBundle 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
+ NeoBundle 'Shougo/unite-outline'
+ NeoBundle 'dgryski/vim-godef'
+ NeoBundle 'vim-jp/vim-go-extra'
+ NeoBundleLazy 'Blackrush/vim-gocode', {"autoload": {"filetypes": ['go']}}
 
  let g:user_emmet_expandabbr_key = '<C-Y>'
-
 
  NeoBundle 'tpope/vim-fugitive'
  autocmd QuickFixCmdPost *grep* cwindow
@@ -300,6 +311,51 @@ if has('vim_starting')
  let g:indent_guides_enable_on_vim_startup = 1
  NeoBundle 'bronson/vim-trailing-whitespace'
 
+ set rtp^=$GOPATH/src/github.com/nsf/gocode/vim
+" if $GOROOT != ''
+"  set rtp+=$GOROOT/misc/vim
+" endif
 
  filetype plugin indent on     " required
  call neobundle#end()
+
+
+ " for golang {{{
+" set path+=$GOPATH/src/**
+ let g:gofmt_command = 'goimports'
+ au BufWritePre *.go Fmt
+ au BufNewFile,BufRead *.go set sw=4 noexpandtab ts=4 completeopt=menu,preview
+ au FileType go compiler go
+ " }}}
+ "
+ "
+
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+    \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+    \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \ },
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+\ }
+
+autocmd BufRead /private/tmp/crontab.* set backupcopy=yes
