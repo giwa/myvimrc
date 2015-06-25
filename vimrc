@@ -234,6 +234,7 @@ endfunction
  " molokai.vim
  let g:molokai_original = 1
  set t_Co=256
+ set background=dark
  colorscheme solarized
 
  " neocomplcache
