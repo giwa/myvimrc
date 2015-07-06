@@ -1,5 +1,5 @@
 "------------------------------------------------------------
- " 基本設定
+ " General preference
  "------------------------------------------------------------
 " set noswapfile            " スワップファイルをつくらない
  set nocompatible          " vi互換モードをオフ（vimの拡張機能を有効)
@@ -14,10 +14,26 @@
  set autowrite
  " キーコードはすぐにタイムアウト  マッピングはタイムアウトしない
  set notimeout ttimeout ttimeoutlen=200
- "filetype plugin indent on
- au BufRead,BufNewFile *.go setlocal filetype=go
+
  "------------------------------------------------------------
- " ステータスライン
+ " Color
+ "------------------------------------------------------------
+ syntax enable " ハイライトを有効化
+ syntax on     " ハイライトを有効化
+ set t_Co=256
+ set background=dark
+ colorscheme solarized
+
+ highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
+ match OverLength /\%>80v.\+/
+ highlight OverLength ctermbg=red ctermfg=white
+ match OverLength /\%81v.\+/
+ set cc=80
+ :hi ColorColumn ctermbg=234
+
+
+ "------------------------------------------------------------
+ " Status line
  "------------------------------------------------------------
  set laststatus=2 " ステータスラインを常に表示する
  set ruler        " ステータスライン上にルーラーを表示する（カーソルが何行目の何列目に置かれているか）
@@ -25,12 +41,49 @@
  " [ファイルフォーマット][エンコーディング][改行タイプ] 行数, 列数／総列数
  set statusline=%F%m%r%h%w\%=[FILETYPE=%Y][ENC=%{&fenc}][%{&ff}]%=%c,\%l/%L
 
- " MEMO
- " powerlineというプラグインを入れるとステータスラインを強化できるようだ
+let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
 
+if has('syntax')
+  augroup InsertHook
+    autocmd!
+    autocmd InsertEnter * call s:StatusLine('Enter')
+    autocmd InsertLeave * call s:StatusLine('Leave')
+  augroup END
+endif
+
+let s:slhlcmd = ''
+function! s:StatusLine(mode)
+  if a:mode == 'Enter'
+    silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+    silent exec g:hi_insert
+  else
+    highlight clear StatusLine
+    silent exec s:slhlcmd
+  endif
+endfunction
+
+function! s:GetHighlight(hi)
+  redir => hl
+  exec 'highlight '.a:hi
+  redir END
+  let hl = substitute(hl, '[\r\n]', '', 'g')
+  let hl = substitute(hl, 'xxx', '', '')
+  return hl
+endfunction
+
+ highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
+ match OverLength /\%>80v.\+/
+ highlight OverLength ctermbg=red ctermfg=white
+ match OverLength /\%81v.\+/
+ set cc=80
+ execute "set colorcolumn=" . join(range(81,335), ',')
+ :hi ColorColumn ctermbg=234
+
+ let mapleader=","
+ inoremap <leader>, <C-x><C-o>
 
  "------------------------------------------------------------
- " インデント
+ " Indent
  "------------------------------------------------------------
  set autoindent     " オートインデント
  set smartindent    " 新しい行を開始した時に、新しい行のインデントを現在行と同じ量にする
@@ -43,9 +96,6 @@
  " softtabstopはTabキー押し下げ時の挿入される空白の量，0の場合はtabstopと同じ，BSにも影響する
  set tabstop=4 shiftwidth=4 softtabstop=0
 
- "filetype plugin on " ファイルタイプの検索を有効にする
- "filetype indent on " ファイルタイプに合わせたインデントを利用する
-
  " MEMO
  " autoindent  : 改行時に半角スペース8文字を挿入する
  " smartindent : 新しい行をつくったときに高度な自動インデントを行う  cindentがONだと無効化される
@@ -56,7 +106,7 @@
 
 
  "------------------------------------------------------------
- " 表示
+ " Display
  "------------------------------------------------------------
  set number     " 行番号を表示
  set showmatch  " カッコの対応をハイライト
@@ -64,8 +114,8 @@
  "set list       " 不可視文字の表示
  "set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
 
- " 全角スペースのハイライト表示
- " 参考：http://code-life.net/?p=2704
+ " Hilight full width space
+ " ref: http://code-life.net/?p=2704
  function! ZenkakuSpace()
    highlight ZenkakuSpace cterm=reverse ctermfg=DarkMagenta gui=reverse guifg=DarkMagenta
  endfunction
@@ -79,11 +129,9 @@
    call ZenkakuSpace()
  endif
 
- " MEMO
- " 不可視文字とはタブ文字や行末文字のことを指す
 
  "------------------------------------------------------------
- " 補完
+ " Complision
  "------------------------------------------------------------
  set wildmenu       " コマンドラインモードでTABキーによる補完を有効化
  set wildchar=<tab> " コマンド補完を開始するキー
@@ -101,13 +149,7 @@
 
 
  "------------------------------------------------------------
- " タグ
- "------------------------------------------------------------
- " とりあえず何もしない
-
-
- "------------------------------------------------------------
- " 検索
+ " Search
  "------------------------------------------------------------
  set wrapscan   " 最後まで検索したら先頭に戻る
  set ignorecase " 大文字小文字を無視する
@@ -115,6 +157,12 @@
  set hlsearch   " 検索語を強調表示
  set incsearch  " インクリメンタルサーチを有効化
 
+
+
+
+ "------------------------------------------------------------
+ " Key map
+ "------------------------------------------------------------
  " Escの2回押しでハイライト消去
  nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
  inoremap <C-j> <Esc>
@@ -122,41 +170,26 @@
  inoremap <silent> hh <ESC>
  inoremap <silent> kk <ESC>
  " inoremap <silent> ll <ESC>
-
-
- " MEMO
- " incsearch : " インクリメンタルサーチとは「検索文字列を入力完了する前に、入力中の文字列にマッチしている場所へ移動する」機能
+ map <C-n> :NERDTreeToggle<CR>
+ " Delete in insert mode
+ inoremap <C-x> <BS>
 
 
  "------------------------------------------------------------
- " 移動
+ " Moving
  "------------------------------------------------------------
  set nostartofline " 移動コマンドを使ったとき、行頭に移動しない
 
 
- " インサートモードでも削除
- inoremap <C-x> <BS>
-
  "------------------------------------------------------------
- " カラー
- "------------------------------------------------------------
- syntax enable " ハイライトを有効化
- syntax on     " ハイライトを有効化
-
- "------------------------------------------------------------
- " 編集
- "------------------------------------------------------------
- " とりあえず何もしない
-
- "------------------------------------------------------------
- " エンコーディング
+ " Encoding
  "------------------------------------------------------------
  set ffs=unix,dos,mac   " 改行文字
  set encoding=utf-8     " デフォルトエンコーディング
  set fileencodings=utf-8
 
  "------------------------------------------------------------
- " その他
+ " Others
  "------------------------------------------------------------
  " Yの動作をDやCと同じにする
  map Y y$
@@ -179,6 +212,9 @@
  " cnoremap : コマンドラインモード限定
  " inoremap : 挿入モード限定
 
+
+ " go
+ let g:go_disable_autoinstall = 0
 
 " https://sites.google.com/site/fudist/Home/vim-nihongo-ban/-vimrc-sample
 """"""""""""""""""""""""""""""
@@ -215,123 +251,25 @@ function! s:GetHighlight(hi)
 endfunction
 """"""""""""""""""""""""""""""
 
- highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
- match OverLength /\%>80v.\+/
- highlight OverLength ctermbg=red ctermfg=white
- match OverLength /\%81v.\+/
- set cc=80
- "au BufRead,BufNewFile *.py set cc=72
- au BufRead,BufNewFile *.rb set tabstop=2 shiftwidth=2
- execute "set colorcolumn=" . join(range(81,335), ',')
- :hi ColorColumn ctermbg=234
 
- let mapleader=","
- inoremap <leader>, <C-x><C-o>
 
  "------------------------------------------------------------
- " プラグイン
+ " Plugin
  "------------------------------------------------------------
- " molokai.vim
- let g:molokai_original = 1
- set t_Co=256
- set background=dark
- colorscheme solarized
+ filetype plugin on
+ nmap <F9> :TagbarToggle<CR>
+ map <C-n> :NERDTreeToggle<CR>
 
- " neocomplcache
- let g:neocomplcache_enable_at_startup = 1 " 起動時に有効化
+ " vim indent guide
+ let g:indent_guides_auto_colors = 0
+ hi IndentGuidesOdd  ctermbg=white
+ hi IndentGuidesEven ctermbg=lightgrey
 
- " coffee script
- autocmd BufWritePost *.coffee silent CoffeeMake! -cb | cwindow | redraw!
-
- " unite.vim
- " 入力モードで開始する
- let g:unite_enable_start_insert=0
-
- " ctrlp
- let g:ctrolp_use_migemo    = 1 " ミゲモ検索
- let g:ctrlp_jump_to_buffer = 2 " タブで開かれた場合はそのタブに切り替える
- let g:ctrlp_open_new_file  = 1 " 新規作成時にタブで開く
-
- " go
-
- " NeoBundle
- filetype off
-
-if has('vim_starting')
-   set runtimepath+=~/.vim/bundle/neobundle.vim/
- endif
-
- call neobundle#begin(expand('~/.vim/bundle/'))
-
- " originalrepos on github
- NeoBundle 'Shougo/neobundle.vim'      " プラグイン管理
-
- NeoBundle 'Shougo/vimproc.vim', {
-             \'build' : {
-             \    'windows' : 'tools\\update-dll-mingw',
-             \    'cygwin' : 'make -f make_cygwin.mak',
-             \    'mac' : 'make -f make_mac.mak',
-             \    'linux' : 'make',
-             \    'unix' : 'gmake',
-             \   },
-             \}
- NeoBundle 'VimClojure'                " vimにおけるクロージャの開発環境
- NeoBundle 'Shougo/vimshell'           " vimからシェルを起動する
- NeoBundle 'Shougo/unite.vim'          " vim上で使用出来る統合ユーザーインターフェース
- NeoBundle 'Shougo/neocomplcache'      " 補完
- NeoBundle 'Shougo/neocomplete'      " 補完
- NeoBundle 'Shougo/neosnippet'         " スニペット
- NeoBundle 'Shougo/neosnippet-snippets'
- NeoBundle 'fatih/vim-go' "syntax for go
- NeoBundle 'jpalardy/vim-slime'        " ??
- NeoBundle 'othree/html5.vim'          " html5のタグのカラー
- NeoBundle 'Townk/vim-autoclose'       " カッコやダブルコーテーションを自動で閉じる
- NeoBundle 'kien/ctrlp.vim.git'        " コマンドラインでのファイル補完
- "NeoBundle 'scrooloose/syntastic.git' " シンタックスのチェック（重たくなるようなのでとりあえず解除）
- NeoBundle 'tpope/vim-pathogen'        " プラグイン管理
- NeoBundle 'thinca/vim-quickrun'       " 各種ソースコードをすばやく実行
- NeoBundle 'scrooloose/nerdcommenter'  " コメントアウト<Leader>c<Space> コメントアウト解除<Leadar>cu
- NeoBundle 'zhaocai/GoldenView.Vim' "Always have a nice view for vim split windows
- NeoBundle 'derekwyatt/vim-scala' "syntax for scala
- NeoBundle 'scrooloose/nerdtree'
- NeoBundle 'mattn/emmet-vim' "zencoding
- "NeoBundle 'bling/vim-airline'
- NeoBundle 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
- NeoBundle 'Shougo/unite-outline'
- NeoBundle 'dgryski/vim-godef'
- NeoBundle 'vim-jp/vim-go-extra'
- NeoBundleLazy 'Blackrush/vim-gocode', {"autoload": {"filetypes": ['go']}}
-
- let g:user_emmet_expandabbr_key = '<C-Y>'
-
- NeoBundle 'tpope/vim-fugitive'
- autocmd QuickFixCmdPost *grep* cwindow
- set statusline+=%{fugitive#statusline()}
-
- NeoBundle 'nathanaelkane/vim-indent-guides'
- let g:indent_guides_enable_on_vim_startup = 1
- NeoBundle 'bronson/vim-trailing-whitespace'
-
- set rtp^=$GOPATH/src/github.com/nsf/gocode/vim
-" if $GOROOT != ''
-"  set rtp+=$GOROOT/misc/vim
-" endif
-
- filetype plugin indent on     " required
- call neobundle#end()
-
-
- " for golang {{{
-" set path+=$GOPATH/src/**
- let g:gofmt_command = 'goimports'
- au BufWritePre *.go Fmt
- au BufNewFile,BufRead *.go set sw=4 noexpandtab ts=4 completeopt=menu,preview
- au FileType go compiler go
- " }}}
- "
- "
-
-let g:tagbar_type_go = {
+ "------------------------------------------------------------
+ " Go
+ "------------------------------------------------------------
+ let g:go_disable_autoinstall = 0
+ let g:tagbar_type_go = {
     \ 'ctagstype' : 'go',
     \ 'kinds'     : [
         \ 'p:package',
@@ -357,6 +295,54 @@ let g:tagbar_type_go = {
     \ },
     \ 'ctagsbin'  : 'gotags',
     \ 'ctagsargs' : '-sort -silent'
-\ }
+ \ }
 
-autocmd BufRead /private/tmp/crontab.* set backupcopy=yes
+
+ "------------------------------------------------------------
+ " NeoBundle
+ "------------------------------------------------------------
+ " Note: Skip initialization for vim-tiny or vim-small.
+ "
+ let g:neocomplete#enable_at_startup = 1
+
+ if 0 | endif
+
+ if has('vim_starting')
+   if &compatible
+     set nocompatible               " Be iMproved
+   endif
+
+   " Required:
+   set runtimepath+=~/.vim/bundle/neobundle.vim/
+ endif
+
+ " Required:
+ call neobundle#begin(expand('~/.vim/bundle/'))
+
+ " Let NeoBundle manage NeoBundle
+ " Required:
+ NeoBundleFetch 'Shougo/neobundle.vim'
+
+ " My Bundles here:
+ " Refer to |:NeoBundle-examples|.
+ " Note: You don't set neobundle setting in .gvimrc!
+ NeoBundle 'Shougo/neocomplete.vim'
+ NeoBundle 'majutsushi/tagbar.git'
+ NeoBundle 'fatih/vim-go.git'
+ NeoBundle 'scrooloose/nerdtree.git'
+ NeoBundle 'othree/html5.vim'          " html5のタグのカラー
+ NeoBundle 'kchmck/vim-coffee-script'
+ NeoBundle 'zhaocai/GoldenView.Vim' "Always have a nice view for vim split windows
+ NeoBundle 'derekwyatt/vim-scala' "syntax for scala
+ NeoBundle 'bronson/vim-trailing-whitespace'
+ NeoBundle 'nathanaelkane/vim-indent-guides'
+
+
+ call neobundle#end()
+
+ " Required:
+ filetype plugin indent on
+
+ " If there are uninstalled bundles found on startup,
+ " this will conveniently prompt you to install them.
+ NeoBundleCheck
