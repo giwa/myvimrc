@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cp $DIR/vimrc ~/.vimrc
 
 # Create directory for vim bundle
-if [ ! -d ~/.vim/bundle]; then
+if [ ! -d ~/.vim/bundle ]; then
     mkdir -p ~/.vim/bundle
 fi
 
